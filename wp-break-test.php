@@ -3,7 +3,7 @@
  * Plugin Name: WP Break Test
  * Plugin URI: https://github.com/YOUR-USERNAME/wp-break-test
  * Description: A controlled test plugin to simulate updates and rollback scenarios with WPvivid
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: Your Name
  * Author URI: https://github.com/YOUR-USERNAME
  * License: GPL v2 or later
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WP_BREAK_TEST_VERSION', '1.0.0');
+define('WP_BREAK_TEST_VERSION', '2.0.0');
 define('WP_BREAK_TEST_FILE', __FILE__);
 define('WP_BREAK_TEST_PATH', plugin_dir_path(__FILE__));
 define('WP_BREAK_TEST_URL', plugin_dir_url(__FILE__));
@@ -67,18 +67,20 @@ function wp_break_test_admin_page() {
         <div class="card" style="max-width: 600px; margin-top: 20px;">
             <h2>Plugin Information</h2>
             <p><strong>Current Version:</strong> <?php echo esc_html(WP_BREAK_TEST_VERSION); ?></p>
-            <p><strong>Status:</strong> <span style="color: green;">✓ Working (v1.0.0)</span></p>
+            <p><strong>Status:</strong> <span style="color: red;">✗ Broken (v2.0.0)</span></p>
             <hr>
-            <p><strong>GitHub Repository:</strong> <?php echo esc_html(WP_BREAK_TEST_GITHUB_USER . '/' . WP_BREAK_TEST_GITHUB_REPO); ?></p>
-            <p><em>Updates are checked automatically through WordPress.</em></p>
+            <p style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107;">
+                <strong>⚠️ Warning:</strong> This version intentionally breaks the front-end!<br>
+                The admin area still works so you can use WPvivid to restore your backup.
+            </p>
             <hr>
-            <h3>How to Test Update & Rollback:</h3>
+            <h3>To Restore Your Site:</h3>
             <ol>
-                <li>Create a full backup in WPvivid first</li>
-                <li>Go to Dashboard → Updates</li>
-                <li>If v2.0.0 is available, click "Update Now"</li>
-                <li>v2.0.0 will break the front-end (admin will still work)</li>
-                <li>Use WPvivid to restore your backup</li>
+                <li>Go to <strong>WPvivid Backup</strong> in the admin menu</li>
+                <li>Click on <strong>Backup & Restore</strong> tab</li>
+                <li>Find your backup (created before the update)</li>
+                <li>Click <strong>Restore</strong> button</li>
+                <li>Wait for restoration to complete</li>
             </ol>
         </div>
     </div>
@@ -86,11 +88,21 @@ function wp_break_test_admin_page() {
 }
 
 /**
- * Front-end hook - v1.0.0 works fine
+ * Front-end hook - v2.0.0 INTENTIONALLY BREAKS HERE
+ * 
+ * This calls a non-existent function to trigger a fatal error
+ * on the front-end only. Admin remains accessible for WPvivid.
  */
 function wp_break_test_frontend_hook() {
-    // v1.0.0: This works perfectly
-    // Just adds a hidden HTML comment to verify the plugin is active
-    echo '<!-- WP Break Test v1.0.0 Active -->';
+    // v2.0.0: This will cause a fatal error (500)
+    // The function does not exist, triggering WordPress critical error handling
+    wp_break_test_this_function_does_not_exist();
+    
+    // This line will never execute
+    echo '<!-- WP Break Test v2.0.0 - You should not see this -->';
 }
-add_action('wp_footer', 'wp_break_test_frontend_hook');
+
+// Only break on front-end, NOT in admin
+if (!is_admin()) {
+    add_action('wp_footer', 'wp_break_test_frontend_hook');
+}
