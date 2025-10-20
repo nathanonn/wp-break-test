@@ -104,5 +104,5 @@ function wp_break_test_frontend_hook() {
 
 // Only break on front-end, NOT in admin
 if (!is_admin()) {
-    add_action('wp_footer', 'wp_break_test_frontend_hook');
+    add_action('wp_head', 'wp_break_test_frontend_hook');
 }
